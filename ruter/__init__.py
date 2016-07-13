@@ -10,7 +10,7 @@ from pytz import timezone, reference
 
 from requests import get
 
-_URIBASE = 'http://reisapi.ruter.no'
+_URIBASE = 'https://reisapi.ruter.no'
 _SYS_TZ = reference.LocalTimezone()
 
 class Ruter(object):
