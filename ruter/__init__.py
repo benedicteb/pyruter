@@ -11,25 +11,24 @@ from requests import get
 _URIBASE = 'https://reisapi.ruter.no'
 _SYS_TZ = reference.LocalTimezone()
 
+
 class Ruter(object):
     def __init__(self, uribase=_URIBASE):
         self.uribase = uribase
         self.location = None
 
-
-    def set_own_location(self, location=None):
+    def set_location(self, location=None):
         """
         Location should be a tuple with x as the first value and y as the second
         """
         self.location = location
 
-
     def get_simple(self, api_method, search_string="", params=None):
-        response = get(urljoin(self.uribase, api_method, search_string), params)
+        response = get(
+            urljoin(self.uribase, api_method, search_string), params)
         verify_response(response)
 
         return json.loads(response.text)
-
 
     def get_validities(self):
         """
@@ -39,20 +38,17 @@ class Ruter(object):
         """
         return self.get_simple('Meta/GetValidities')
 
-
     def get_hearbeat(self):
         """
         http://reisapi.ruter.no/Help/Api/GET-Heartbeat-Index
         """
         return self.get_simple('Heartbeat/Index')
 
-
     def get_street(self, street_id):
         """
         http://reisapi.ruter.no/Help/Api/GET-Street-GetStreet-id
         """
         return self.get_simple('Street/GetStreet', street_id)
-
 
     def get_trip(self, trip_id, trip_time=None):
         params = {}
@@ -61,7 +57,6 @@ class Ruter(object):
             params['time'] = trip_time
 
         return self.get_simple('Trip/GetTrip', trip_id, params)
-
 
     def get_places(self, search_string, location=None, counties=None):
         """
@@ -79,20 +74,17 @@ class Ruter(object):
 
         return self.get_simple('Place/GetPlaces', search_string, params)
 
-
     def get_place(self, search_string, location=None):
         """
         http://reisapi.ruter.no/Help/Api/GET-Place-GetPlaces-id_location
         """
         return self.get_places(search_string, location)[0]
 
-
     def get_stop(self, stop_id):
         """
         http://reisapi.ruter.no/Help/Api/GET-Place-GetStop-id
         """
         return self.get_simple('Place/GetStop', stop_id)
-
 
     def get_stops_ruter(self):
         """
@@ -106,13 +98,11 @@ class Ruter(object):
         """
         return self.get_simple('Travel/GetTravels', '', travel_args)
 
-
     def get_travels_extension(self, **travel_args):
         """
         http://reisapi.ruter.no/Help/Api/GET-Travel-GetTravelsExtension_fromplace_toplace_isafter_time_changemargin_changepunish_walkingfactor_proposals_transporttypes_maxwalkingminutes_linenames_showIntermediatePlaces_ignoreRealtimeUpdates
         """
         return self.get_simple('Travel/GetTravelsExtension', '', travel_args)
-
 
     def get_lines(self, ruter_operated_only=False, extended=False):
         """
@@ -125,9 +115,7 @@ class Ruter(object):
                 url = 'Line/GetLinesRuter/Extended'
             else:
                 url = 'Line/GetLinesRuter'
-            return self.get_simple(url, '', {
-                'ruterOperatedOnly': True
-            })
+            return self.get_simple(url, '', {'ruterOperatedOnly': True})
         else:
             return self.get_simple('Line/GetLines')
 
@@ -137,20 +125,17 @@ class Ruter(object):
         """
         return self.get_simple('Line/GetLinesByStopID', stop_id)
 
-
     def get_data_by_line_id(self, line_id):
         """
         http://reisapi.ruter.no/Help/Api/GET-Line-GetDataByLineID-id
         """
         return self.get_simple('Line/GetDataByLineID', line_id)
 
-
     def get_stops_by_line_id(self, line_id):
         """
         http://reisapi.ruter.no/Help/Api/GET-Line-GetStopsByLineID-id
         """
         return self.get_simple('Line/GetStopsByLineID', line_id)
-
 
     def get_departures(self,
                        stop_id,
@@ -173,24 +158,27 @@ class Ruter(object):
 
         return self.get_simple('StopVisit/GetDepartures', stop_id, params)
 
-
     def get_next_departure(self, stop_id, linename, direction):
         """
         direction: 1 is towards city center, 2 is west
         """
         all_departures = self.get_departures(stop_id, linenames=linename)
-        all_departures = [d for d in all_departures if
-            d['MonitoredVehicleJourney']['DirectionName'] == str(direction)]
+        all_departures = [
+            d for d in all_departures
+            if d['MonitoredVehicleJourney']['DirectionName'] == str(direction)
+        ]
 
-        next_departure = min(all_departures, key=lambda elm:
-            elm['MonitoredVehicleJourney']['MonitoredCall']['ExpectedArrivalTime'])
+        next_departure = min(
+            all_departures,
+            key=
+            lambda elm: elm['MonitoredVehicleJourney']['MonitoredCall']['ExpectedArrivalTime']
+        )
 
         return next_departure['MonitoredVehicleJourney']
 
-
     def get_time_until_next_departure(self, stop_id, linename, direction):
-        departure = self.get_next_departure(stop_id, linename=linename,
-                direction=direction)
+        departure = self.get_next_departure(
+            stop_id, linename=linename, direction=direction)
 
         departure_dt =\
             localize(dparse(departure['MonitoredCall']['ExpectedArrivalTime']))
