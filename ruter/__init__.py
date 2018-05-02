@@ -38,7 +38,7 @@ class Ruter(object):
         """
         return self.get_simple('Meta/GetValidities')
 
-    def get_hearbeat(self):
+    def get_heartbeat(self):
         """
         http://reisapi.ruter.no/Help/Api/GET-Heartbeat-Index
         """
