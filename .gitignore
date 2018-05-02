@@ -2,3 +2,4 @@ build/
 dist/
 env/
 pyruter.egg-info/
+*__pycache__*
